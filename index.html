@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Næste Flagdag for Busser</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        h1 {
+            color: #333;
+        }
+        p {
+            font-size: 24px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Næste Flagdag for Busser</h1>
+    <p id="flagday"></p>
+    <p id="currentDate"></p>
+    <p id="countdown"></p>
+
+    <script>
+        // List of bus flag days (without year) and their names
+        const busFlagDays = [
+            { date: '02-05', name: 'Kronprinsesse Marys fødselsdag' },
+            { date: '02-06', name: 'Prinsesse Maries fødselsdag' },
+            { date: '03-23', name: 'Nordens dag (København og Frederiksberg kommuner)' },
+            { date: '04-16', name: 'Dronning Margrethes fødselsdag' },
+            { date: '04-29', name: 'Prinsesse Benediktes fødselsdag' },
+            { date: '05-05', name: 'Danmarks befrielse' },
+            { date: '05-09', name: 'Europadag (København og Frederiksberg kommuner)' },
+            { date: '05-26', name: 'Kronprins Frederiks fødselsdag' },
+            { date: '06-05', name: 'Grundlovsdag' },
+            { date: '06-07', name: 'Prins Joachims fødselsdag' },
+            { date: '06-15', name: 'Valdemarsdag/Genforeningsdag' },
+            { date: '08-21', name: 'Copenhagen Pride (København og Frederiksberg kommuner)' },
+            { date: '09-05', name: 'Danmark udsendte' },
+            // Add more flag days as needed (in MM-DD format) along with their names
+        ];
+
+        // JavaScript to find and display the nearest flag day and the following flag day
+        const flagDayElement = document.getElementById("flagday");
+        const currentDateElement = document.getElementById("currentDate");
+        const countdownElement = document.getElementById("countdown");
+        const currentDate = new Date();
+
+        // Find the nearest flag day
+        let nearestFlagDay = new Date(currentDate.getFullYear(), busFlagDays[0].date.split('-')[0] - 1, busFlagDays[0].date.split('-')[1]);
+        let nearestFlagName = busFlagDays[0].name;
+        for (const flagDay of busFlagDays) {
+            const [month, day] = flagDay.date.split('-');
+            const flagDate = new Date(currentDate.getFullYear(), month - 1, day);
+            if (flagDate >= currentDate && (flagDate < nearestFlagDay || nearestFlagDay <= currentDate)) {
+                nearestFlagDay = flagDate;
+                nearestFlagName = flagDay.name;
+            }
+        }
+
+        // Find the following flag day
+        let followingFlagDay = new Date(nearestFlagDay);
+        for (const flagDay of busFlagDays) {
+            const [month, day] = flagDay.date.split('-');
+            const flagDate = new Date(currentDate.getFullYear(), month - 1, day);
+            if (flagDate > nearestFlagDay) {
+                followingFlagDay = flagDate;
+                break;
+            }
+        }
+
+        // Calculate the time remaining to the following flag day
+        let timeRemaining = Math.floor((followingFlagDay - currentDate) / (1000 * 60 * 60 * 24));
+
+        // If the following flag day is in the past, it's in the next year
+        if (followingFlagDay < currentDate) {
+            followingFlagDay.setFullYear(currentDate.getFullYear() + 1);
+            timeRemaining = Math.floor((followingFlagDay - currentDate) / (1000 * 60 * 60 * 24));
+        }
+
+        // Display the current date
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const formattedCurrentDate = currentDate.toLocaleDateString('da-DK', options);
+        currentDateElement.textContent = `Dagens dato er ${formattedCurrentDate}`;
+
+        // Display flag days information
+        if (timeRemaining === 0) {
+            flagDayElement.innerHTML = `Busserne flager for <strong>${nearestFlagName}</strong> i dag!`;
+            countdownElement.innerHTML = `Dagen i dag er en flagdag.`;
+        } else {
+            flagDayElement.innerHTML = `Næste flagdag for busser er <strong>${nearestFlagName}</strong>.`;
+            countdownElement.innerHTML = `Der er <strong>${timeRemaining + 1} dage</strong> til næste flagdag for busser, som er <strong>${followingFlagDay.toLocaleDateString('da-DK', options)}</strong>.`;
+        }
+    </script>
+
+<footer style="background-color: rgba(54, 67, 74, 0.811); color: #fff; padding: 20px; position: fixed; bottom: 0; left: 0; width: 100%;">
+    <p>Disse informationer er taget fra DOT's officelle hjemmeside. <a href="https://dinoffentligetransport.dk/nyheder/flagdage-i-movia/">Læs mere her</a></p>
+</footer>
+
+
+</body>
+</html>
